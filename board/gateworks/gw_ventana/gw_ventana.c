@@ -753,7 +753,7 @@ static const struct boot_mode board_boot_modes[] = {
 int misc_init_r(void)
 {
 	struct ventana_board_info *info = &ventana_info;
-	char buf[256];
+	char buf[384];
 	int i;
 
 	/* set env vars based on EEPROM data */
@@ -919,13 +919,27 @@ int misc_init_r(void)
 	}
 
 	/* Set a non-initialized hwconfig based on board configuration */
-	if (!strcmp(getenv("hwconfig"), "_UNKNOWN_")) {
+	/*
+		Initialize a 5520 for GSI
+	*/
+	if (!strcmp(getenv("hwconfig"), "_UNKNOWN_") || board_type == GW552x || board_type == GW52xx ) {
 		buf[0] = 0;
 		if (gpio_cfg[board_type].rs232_en)
 			strcat(buf, "rs232;");
 		for (i = 0; i < gpio_cfg[board_type].dio_num; i++) {
-			char buf1[32];
-			sprintf(buf1, "dio%d:mode=gpio;", i);
+			char buf1[64];
+			/* 
+				initialize dio0-9 dio1:mode=pwm, diox:mode=gpio,padctrl=0x130B9; 
+			*/
+			if (board_type == GW552x)
+			{
+				if (i != 1)
+					sprintf(buf1, "dio%d:mode=gpio,padctrl=0x130B9;", i);
+				else
+					sprintf(buf1, "dio%d:mode=pwm,padctrl=0x1F0B9;", i);
+			}
+			else
+				sprintf(buf1, "dio%d:mode=gpio;", i);
 			if (strlen(buf) + strlen(buf1) < sizeof(buf))
 				strcat(buf, buf1);
 		}
@@ -941,6 +955,11 @@ int misc_init_r(void)
 
 	/* disable boot watchdog */
 	gsc_boot_wd_disable();
+
+	///
+	/// saveenv added for GSI
+	///
+	saveenv();
 
 	return 0;
 }

@@ -251,15 +251,15 @@
 #endif
 
 /* Environment */
-#define CONFIG_IPADDR             192.168.1.1
-#define CONFIG_SERVERIP           192.168.1.146
+#define CONFIG_IPADDR             192.168.1.70
+#define CONFIG_SERVERIP           192.168.1.75
 
 #define CONFIG_EXTRA_ENV_SETTINGS_COMMON \
 	"pcidisable=1\0" \
 	"splashpos=m,m\0" \
 	"usb_pgood_delay=2000\0" \
 	"console=ttymxc1\0" \
-	"bootdevs=usb mmc sata flash\0" \
+	"bootdevs=flash usb mmc sata\0" \
 	"hwconfig=_UNKNOWN_\0" \
 	"video=\0" \
 	\
